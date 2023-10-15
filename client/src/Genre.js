@@ -12,7 +12,7 @@ function Genre() {
   //sending to server
   const handleGenreClick = async (genreId, genreName) => {
     try {
-      const response = await axios.post(`http://localhost:3000/api/selectedGenre/${genreId}`);
+      const response = await axios.post(`https://cap-project-server.vercel.app/api/selectedGenre/${genreId}`);
       const responseData = response.data;  
 
       navigate('/Lists', {
