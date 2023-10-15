@@ -48,7 +48,7 @@ function Cards() {
   useEffect(() => {
     async function fetchTrendingTVShows() {
       try {
-        const response = await axios.get('http://localhost:3000/api/trendingTVShows');
+        const response = await axios.get('https://cap-project-server.vercel.app/api/trendingTVShows');
         const data = response.data;
         setTvShows(data);
       } catch (error) {
