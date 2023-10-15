@@ -42,7 +42,7 @@ function Genre() {
     async function fetchGenres() {
       try {
 
-        const response = await axios.get('http://localhost:3000/api/genres'); // Assuming your server is running on the same domain
+        const response = await axios.get('https://cap-project-server.vercel.app/api/genres'); // Assuming your server is running on the same domain
         const data =response.data
         setGenres(data);
         

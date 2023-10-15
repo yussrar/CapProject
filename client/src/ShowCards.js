@@ -18,7 +18,7 @@ function Cards() {
         tvShowName: tvShowName,
       };
 
-      const response = await axios.post('http://localhost:3000/api/showDetails', data);
+      const response = await axios.post('https://cap-project-server.vercel.app/api/showDetails', data);
       const responseData = response.data;
 
 
