@@ -24,9 +24,9 @@ const options = {
   }
 };
 
-app.get('/'), async(req, res) =>{
+app.get('/', (req, res) => {
   res.send("Server Running");
-}
+});
 
 app.get('/api/trendingTVShows', async (req, res) => {
   try {
