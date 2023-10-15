@@ -24,6 +24,10 @@ const options = {
   }
 };
 
+app.get('/'), async(req, res) =>{
+  res.send("Server Running");
+}
+
 app.get('/api/trendingTVShows', async (req, res) => {
   try {
     const response = await fetch(url, options);
