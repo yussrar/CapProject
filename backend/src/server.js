@@ -1,15 +1,132 @@
 import express from "express";
 import bodyParser from "body-parser";
-const app = express();
+import { MongoClient, ServerApiVersion} from "mongodb";
 import cors from "cors"
 import fetch from "node-fetch";
+import bcrypt from "bcrypt";
 
+
+
+
+const app = express();
 const port = process.env.PORT || 3000; 
-// Define a simple route
-
-app.use(cors());
+const uri = "mongodb+srv://yusrajamal:yusrajamal@cluster0.stijliu.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});app.use(cors());
 app.use(bodyParser.json());
 
+
+//connecting to db trial
+async function connectToDatabase() {
+  try {
+    // Connect to the MongoDB Atlas cluster
+    await client.connect();
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+// Call the connectToDatabase function to establish the connection
+connectToDatabase();
+
+//Add a user to mongo db
+
+async function addUser(name, email, password) {
+  try {
+    await client.connect();
+    const db = client.db('BananaBinge');
+    const usersCollection = db.collection('users');
+
+    // Create a new user document
+    const newUser = {
+      name: name,
+      email: email,
+      password: password, // Ensure to hash the password before inserting
+    };
+
+    // Insert the new user document into the 'users' collection
+    const result = await usersCollection.insertOne(newUser);
+
+    console.log(`Inserted a new user with the id: ${result.insertedId}`);
+  } catch (error) {
+    console.error('Error adding a user:', error);
+  } finally {
+    // Close the MongoDB connection
+    await client.close();
+  }
+}
+
+//Registration -for getting user Values
+app.post('/api/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Hash the user's password before storing it
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Call your addUser function to add the user to the database
+    addUser(name, email, hashedPassword);
+
+    // Send a success response to the client
+    res.status(200).json({ message: 'Registration successful' });
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ message: 'Registration failed' });
+  }
+});
+
+//getting user by email 
+async function getUserByEmail(email) {
+  try {
+    await client.connect();
+    const db = client.db('BananaBinge');
+    const usersCollection = db.collection('users');
+
+    // Find the user with the provided email
+    const user = await usersCollection.findOne({ email: email });
+
+    return user;
+  } catch (error) {
+    console.error('Error fetching a user by email:', error);
+    return null;
+  } finally {
+    // Close the MongoDB connection
+    await client.close();
+  }
+}
+
+
+//log in 
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Retrieve the user with the provided email from the database
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+      res.status(401).json({ message: 'User not found' });
+      return;
+    }
+
+    // Verify the provided password against the stored password hash
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (passwordMatch) {
+      res.status(200).json({ message: 'Login successful', user });
+    } else {
+      res.status(401).json({ message: 'Incorrect password' });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Login failed' });
+  }
+});
 
 
 
