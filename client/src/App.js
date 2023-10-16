@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
 import Header from './Header';
 import Search from './Search';
 import Genre from './Genre';
@@ -8,6 +7,8 @@ import ShowCards from './ShowCards';
 import Footer from './Footer';
 import Lists from './Lists';
 import Details from './Details';
+import Register from './Register';
+import Login from './Login';
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Route path="/" element={ <div> <Search /> <Genre /> <ShowCards /> </div> } />
           <Route path="/Lists" element={<Lists />} />
           <Route path="/Details" element={<Details />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Register" element={<Register />} />
         </Routes>
         <Footer />
       </div>
