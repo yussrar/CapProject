@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 import { MongoClient, ServerApiVersion} from "mongodb";
 import cors from "cors"
 import fetch from "node-fetch";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs"; 
+
 
 
 
