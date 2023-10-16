@@ -110,7 +110,7 @@ app.post('/api/login', async (req, res) => {
     const user = await getUserByEmail(email);
 
     if (!user) {
-      res.status(401).json({ message: 'User not found' });
+      res.status(401).json({ message: 'User is not found' });
       return;
     }
 
