@@ -19,7 +19,13 @@ const client = new MongoClient(uri, {
   }
 });
 
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:3001', // Your specific origin
+  methods: 'POST', // Allow only 'POST' method
+  credentials: true, // Allow credentials (cookies)
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 
