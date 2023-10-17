@@ -19,7 +19,7 @@ const client = new MongoClient(uri, {
   }
 });
 
-app.use(cors);
+app.use(cors());
 app.use(bodyParser.json());
 
 
