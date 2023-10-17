@@ -25,35 +25,40 @@ const Login = () => {
 
   const handleLogin = async () => {
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      setErrorMessage('Invalid email format');
+        setErrorMessage('Invalid email format');
     } else if (formData.password.length > 20) {
-      setErrorMessage('Password should be less than 20 characters');
+        setErrorMessage('Password should be less than 20 characters');
     } else {
-      try {
-        const response = await fetch('https://cap-project-server.vercel.app/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(formData),
-        });
+        try {
+            const response = await fetch('https://cap-project-server.vercel.app/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Credentials': 'true',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, DELETE, POST, PUT',
+                    'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+                },
+                credentials: 'include',
+                body: JSON.stringify(formData),
+            });
 
-        if (response.status === 200) {
-          const data = await response.json();
-          const user = data.user;
-          setUser(user);
-          // Navigate to the Home component and send user data as state
-          navigate('/');
-
-        } else {
-          setErrorMessage('Login failed');
+            if (response.status === 200) {
+                const data = await response.json();
+                const user = data.user;
+                setUser(user);
+                // Navigate to the Home component and send user data as state
+                navigate('/');
+            } else {
+                setErrorMessage('Login failed');
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
         }
-      } catch (error) {
-        console.error('Error during login:', error);
-      }
     }
-  };
+};
+
+
 
   return (
     <div className="container">
