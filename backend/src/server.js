@@ -20,7 +20,7 @@ const client = new MongoClient(uri, {
 });
 
 const corsOptions = {
-  origin: 'https://cap-project-client.vercel.app/', // Your specific origin
+  origin: 'https://cap-project-client.vercel.app', // Your specific origin
   methods: 'POST', // Allow only 'POST' method
   credentials: true, // Allow credentials (cookies)
 };
