@@ -11,7 +11,7 @@ const Header = () => {
     // Check if a user session exists when the component mounts
     async function checkUserSession() {
       try {
-        const response = await fetch('http://localhost:3000/api/profile', {
+        const response = await fetch('https://cap-project-server.vercel.app/api/profile', {
           method: 'GET',
           credentials: 'include',
         });
@@ -49,7 +49,7 @@ const Header = () => {
           Hello, {user.name}
           {isDropdownOpen && (
             <ul className="dropdown-menu">
-              <li><Link to="https://cap-project-server.vercel.app/api/profile">My Profile</Link></li>
+              <li><Link to="/api/profile">My Profile</Link></li>
               <li><Link to="/wishlist">Wish List</Link></li>
               <li><Link to="/logout">Logout</Link></li>
             </ul>
