@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useUser } from './UserProvider'; // Import the user context
 
 
 
@@ -8,6 +9,7 @@ const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const message = new URLSearchParams(location.search).get('message');
+  const { setUser } = useUser();
 
 
   const [formData, setFormData] = useState({
@@ -33,15 +35,16 @@ const Login = () => {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(formData),
         });
 
         if (response.status === 200) {
           const data = await response.json();
-          console.log(data.user);
           const user = data.user;
+          setUser(user);
           // Navigate to the Home component and send user data as state
-          navigate('/', { state: { user } });;
+          navigate('/');
 
         } else {
           setErrorMessage('Login failed');

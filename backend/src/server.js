@@ -4,25 +4,28 @@ import { MongoClient, ServerApiVersion} from "mongodb";
 import cors from "cors"
 import fetch from "node-fetch";
 import bcrypt from "bcryptjs"; 
-
-
-
-
+import session from "express-session";
+import MongoStore from "connect-mongo"; // Use 'connect-mongo' instead of 'require'
 
 const app = express();
-const port = process.env.PORT || 3000; 
-const uri = "mongodb+srv://yusrajamal:yusrajamal@cluster0.stijliu.mongodb.net/?retryWrites=true&w=majority";
+const port = process.env.PORT || 3000;
+
+const uri = "mongodb+srv://yusrajamal:yusrajamal@cluster0.stijliu.mongodb.net/BananaBinge?retryWrites=true&w=majority";
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   }
-});app.use(cors());
+});
+
+app.use(cors({
+  origin: 'http://localhost:3001', // Replace with your client's origin
+  credentials: true,
+}));
 app.use(bodyParser.json());
 
 
-//connecting to db trial
 async function connectToDatabase() {
   try {
     // Connect to the MongoDB Atlas cluster
@@ -32,14 +35,28 @@ async function connectToDatabase() {
     console.error('Error connecting to MongoDB:', error);
   }
 }
-// Call the connectToDatabase function to establish the connection
 connectToDatabase();
+
+app.use(
+  session({
+    secret: 'secretkey',
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ client: client }), // Use the MongoDB store
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: 'none',
+    },
+  })
+);
+
 
 //Add a user to mongo db
 
 async function addUser(name, email, password) {
   try {
-    await client.connect();
+    
     const db = client.db('BananaBinge');
     const usersCollection = db.collection('users');
 
@@ -56,10 +73,8 @@ async function addUser(name, email, password) {
     console.log(`Inserted a new user with the id: ${result.insertedId}`);
   } catch (error) {
     console.error('Error adding a user:', error);
-  } finally {
-    // Close the MongoDB connection
-    await client.close();
-  }
+  } 
+    
 }
 
 //Registration -for getting user Values
@@ -84,7 +99,7 @@ app.post('/api/register', async (req, res) => {
 //getting user by email 
 async function getUserByEmail(email) {
   try {
-    await client.connect();
+    
     const db = client.db('BananaBinge');
     const usersCollection = db.collection('users');
 
@@ -95,10 +110,7 @@ async function getUserByEmail(email) {
   } catch (error) {
     console.error('Error fetching a user by email:', error);
     return null;
-  } finally {
-    // Close the MongoDB connection
-    await client.close();
-  }
+  } 
 }
 
 
@@ -119,6 +131,10 @@ app.post('/api/login', async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
+      req.session.user = user;
+      console.log('User logged in:', user);
+      console.log('Session:', req.session);
+
       res.status(200).json({ message: 'Login successful', user });
     } else {
       res.status(401).json({ message: 'Incorrect password' });
@@ -129,7 +145,29 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+app.get('/api/profile', (req, res) => {
+  if (req.session.user) {
+    // User is authenticated, and you can access user data
+    const user = req.session.user;
+    console.log('User profile accessed:', user);
+    res.json({ message: 'Access granted', user });
+  } else {
+    res.status(401).json({ message: 'Access denied' });
+  }
+});
 
+
+//logout
+app.post('/api/logout', (req, res) => {
+  // Destroy the user's session to log them out
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ message: 'Error logging out' });
+    } else {
+      res.json({ message: 'Logout successful' });
+    }
+  });
+});
 
 //For getting the data from the movie db api
 const url = 'https://api.themoviedb.org/3/trending/tv/day';
@@ -241,3 +279,11 @@ app.post('/api/showDetails', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+process.on('SIGINT', () => {
+  console.log('Server is shutting down...');
+  // Close the MongoDB connection gracefully
+  client.close();
+  process.exit(0);
+});
+
