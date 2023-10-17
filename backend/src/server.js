@@ -18,9 +18,8 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-const cors = require('cors');
 
-app.use(cors(corsOptions));
+app.use(cors);
 app.use(bodyParser.json());
 
 
