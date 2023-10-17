@@ -19,10 +19,6 @@ const client = new MongoClient(uri, {
   }
 });
 
-app.use(cors({
-  origin: 'https://cap-project-server.vercel.app', // Replace with your client's origin
-  credentials: true,
-}));
 app.use(bodyParser.json());
 
 
