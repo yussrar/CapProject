@@ -49,7 +49,7 @@ const Header = () => {
           Hello, {user.name}
           {isDropdownOpen && (
             <ul className="dropdown-menu">
-              <li><Link to="http://localhost:3000/api/profile">My Profile</Link></li>
+              <li><Link to="https://cap-project-server.vercel.app/api/profile">My Profile</Link></li>
               <li><Link to="/wishlist">Wish List</Link></li>
               <li><Link to="/logout">Logout</Link></li>
             </ul>
